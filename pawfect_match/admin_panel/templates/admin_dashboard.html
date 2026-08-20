@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Pawfect Match Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8fafc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #334155;
+        }
+        .admin-navbar {
+            background-color: #1a252f !important; 
+            padding: 14px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .admin-brand {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #ff9f43 !important; 
+        }
+        .stat-card {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+        .stat-icon-doctors { background-color: #eff6ff; color: #3b82f6; }
+        .stat-icon-pets { background-color: #ecfdf5; color: #10b981; }
+        .stat-icon-groups { background-color: #fef3c7; color: #f59e0b; }
+        
+        .section-card {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .table th {
+            font-weight: 600;
+            color: #64748b;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+        .table td {
+            vertical-align: middle;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .btn-add-vet {
+            background-color: #f59e0b;
+            color: #ffffff;
+            font-weight: 600;
+            border-radius: 9999px;
+            padding: 8px 18px;
+            border: none;
+        }
+        .btn-add-vet:hover {
+            background-color: #d97706;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navbar -->
+    <nav class="admin-navbar sticky-top mb-4">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a class="admin-brand d-flex align-items-center gap-2 text-decoration-none" href="#">
+                <i class="fa-solid fa-paw fs-4"></i>
+                <span>Pawfect Match Admin</span>
+            </a>
+            <div class="d-flex align-items-center gap-3">
+                <a href="{% url 'customer:index' %}" class="btn btn-outline-light btn-sm rounded-pill px-3">
+                    <i class="fa-solid fa-globe me-1"></i> Customer Site
+                </a>
+                <a href="{% url 'accounts:logout' %}" class="btn btn-danger btn-sm rounded-pill px-3">
+                    <i class="fa-solid fa-right-from-bracket me-1"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container pb-5">
+        
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold mb-1">Overview & Management</h3>
+                <p class="text-muted small mb-0">Manage appointments, users, pet listings, and communities.</p>
+            </div>
+            <div>
+                <a href="{% url 'admin_panel:add_doctor' %}" class="btn btn-add-vet btn-sm d-flex align-items-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-user-doctor"></i> Add New Vet Doctor
+                </a>
+            </div>
+        </div>
+
+        <!-- Metric Stat Cards (4 Columns: Users, Doctors, Pets, Groups) -->
+<div class="row g-3 mb-4">
+    <!-- 1. Registered Users (First) -->
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon" style="background-color: #f3e8ff; color: #9333ea;">
+                <i class="fa-solid fa-users"></i>
+            </div>
+            <div>
+                <div class="text-muted small fw-semibold">REGISTERED USERS</div>
+                <h4 class="fw-bold mb-0">{{ total_users|default:"0" }}</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Vet Doctors -->
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon stat-icon-doctors">
+                <i class="fa-solid fa-user-doctor"></i>
+            </div>
+            <div>
+                <div class="text-muted small fw-semibold">VET DOCTORS</div>
+                <h4 class="fw-bold mb-0">{{ total_doctors|default:"0" }}</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Listed Pets -->
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon stat-icon-pets">
+                <i class="fa-solid fa-paw"></i>
+            </div>
+            <div>
+                <div class="text-muted small fw-semibold">LISTED PETS</div>
+                <h4 class="fw-bold mb-0">{{ total_pets|default:"0" }}</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Community Groups -->
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon stat-icon-groups">
+                <i class="fa-solid fa-comments"></i>
+            </div>
+            <div>
+                <div class="text-muted small fw-semibold">COMMUNITY GROUPS</div>
+                <h4 class="fw-bold mb-0">{{ total_groups|default:"0" }}</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <!-- Vet Doctors Section -->
+        <div class="section-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0"><i class="fa-solid fa-user-doctor text-primary me-2"></i>Vet Doctors</h5>
+                <a href="{% url 'admin_panel:add_doctor' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                    + Add Doctor
+                </a>
+            </div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Doctor</th>
+                            <th>Specialization</th>
+                            <th>Qualification</th>
+                            <th>District</th>
+                            <th>Fee</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for doc in doctors_list %}
+                        <tr>
+                            <td class="fw-semibold">Dr. {{ doc.user.username }}</td>
+                            <td><span class="badge bg-info-subtle text-info">{{ doc.specialization }}</span></td>
+                            <td>{{ doc.qualification }}</td>
+                            <td>{{ doc.district }}</td>
+                            <td>₹{{ doc.consultation_fee }}</td>
+                            <td class="text-end">
+                                <a href="{% url 'admin_panel:edit_doctor' doc.id %}" class="btn btn-sm btn-outline-primary rounded-pill px-2 py-1 me-1">
+                                    <i class="fa-solid fa-pen-to-square"></i> Edit
+                                </a>
+                                <a href="{% url 'admin_panel:delete_doctor' doc.id %}" onclick="return confirm('Delete this doctor?')" class="btn btn-sm btn-outline-danger rounded-pill px-2 py-1">
+                                    <i class="fa-solid fa-trash"></i> Delete
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-3">No vet doctors added yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        
+        <!-- 2 Columns: Pet Listings & Manage Communities -->
+<div class="row g-4 mb-5">
+    
+    <!-- Pet Listings -->
+    <div class="col-lg-6">
+        <div class="section-card h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0"><i class="fa-solid fa-dog text-success me-2"></i>Pet Listings</h5>
+                <!-- View All Modal Trigger -->
+                <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#allPetsModal" type="button">
+                    View All ({{ total_pets }})
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Breed</th>
+                            <th>Price</th>
+                            <th>Owner</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pet in recent_pets %}
+                        <tr>
+                            <td class="fw-semibold">{{ pet.breed }}</td>
+                            <td class="text-dark fw-bold">₹{{ pet.price }}</td>
+                            <td class="text-muted">{{ pet.seller.username }}</td>
+                            <td class="text-end">
+                                <a href="{% url 'admin_panel:delete_pet' pet.id %}" 
+                                   onclick="return confirm('Are you sure you want to remove this pet listing?')" 
+                                   class="btn btn-sm btn-outline-danger rounded-pill px-2 py-1">
+                                    <i class="fa-solid fa-trash me-1"></i> Remove
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-3">No pet listings available.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manage Communities -->
+    <div class="col-lg-6">
+        <div class="section-card h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0"><i class="fa-solid fa-users text-warning me-2"></i>Manage Communities</h5>
+                <!-- View Groups Modal Trigger -->
+                <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#allGroupsModal" type="button">
+                    View Groups ({{ total_groups }})
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Group Name</th>
+                            <th>Created By</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for group in recent_groups %}
+                        <tr>
+                            <td class="fw-semibold">{{ group.name }}</td>
+                            <td class="text-muted">{{ group.created_by.username }}</td>
+                            <td class="text-end">
+                                <a href="{% url 'admin_panel:delete_group' group.id %}" 
+                                   onclick="return confirm('Are you sure you want to remove this community group?')" 
+                                   class="btn btn-sm btn-outline-danger rounded-pill px-2 py-1">
+                                    <i class="fa-solid fa-trash me-1"></i> Remove
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted py-3">No community groups found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal 1: All Pet Listings -->
+<div class="modal fade" id="allPetsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold text-dark"><i class="fa-solid fa-paw text-success me-2"></i>All Listed Pets</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Name / Breed</th>
+                            <th>Price</th>
+                            <th>Owner</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pet in all_pets %}
+                        <tr>
+                            <td class="fw-semibold">{{ pet.name|default:pet.breed }} <small class="text-muted">({{ pet.breed }})</small></td>
+                            <td class="text-dark fw-bold">₹{{ pet.price }}</td>
+                            <td class="text-muted">{{ pet.seller.username }}</td>
+                            <td class="text-end">
+                                <a href="{% url 'admin_panel:delete_pet' pet.id %}" 
+                                   onclick="return confirm('Delete this pet?')" 
+                                   class="btn btn-sm btn-outline-danger rounded-pill px-2 py-1">
+                                    <i class="fa-solid fa-trash me-1"></i> Remove
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-center py-3 text-muted">No pets found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal 2: All Communities -->
+<div class="modal fade" id="allGroupsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold text-dark"><i class="fa-solid fa-users text-warning me-2"></i>All Community Groups</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Group Name</th>
+                            <th>Description</th>
+                            <th>Created By</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for group in all_groups %}
+                        <tr>
+                            <td class="fw-semibold">{{ group.name }}</td>
+                            <td class="text-muted small text-truncate" style="max-width: 200px;">{{ group.description }}</td>
+                            <td class="text-muted">{{ group.created_by.username }}</td>
+                            <td class="text-end">
+                                <a href="{% url 'admin_panel:delete_group' group.id %}" 
+                                   onclick="return confirm('Delete this group?')" 
+                                   class="btn btn-sm btn-outline-danger rounded-pill px-2 py-1">
+                                    <i class="fa-solid fa-trash me-1"></i> Remove
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-center py-3 text-muted">No groups found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

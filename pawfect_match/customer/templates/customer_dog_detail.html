@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ dog.name }} | Pawfect Match</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .pet-detail-img {
+            width: 100%;
+            max-height: 460px;
+            object-fit: cover;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .price-tag {
+            background-color: #ff9800;
+            color: #fff;
+            font-size: 1.5rem;
+            font-weight: 700;
+            padding: 8px 24px;
+            border-radius: 12px;
+            display: inline-block;
+        }
+        .contact-btn {
+            background-color: #343a40;
+            color: #fff;
+            font-weight: 600;
+            border-radius: 50px;
+            padding: 14px 28px;
+            transition: all 0.3s;
+        }
+        .contact-btn:hover {
+            background-color: #212529;
+            color: #ffc107;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+    <!-- Top Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-3 sticky-top shadow-sm">
+        <div class="container">
+            <!-- Brand Logo -->
+            <a class="navbar-brand fw-bold text-warning fs-4" href="{% url 'customer:index' %}">
+                <i class="fa-solid fa-paw me-2"></i>Pawfect Match
+            </a>
+
+            <!-- Right Buttons -->
+            <div class="d-flex align-items-center gap-2 ms-auto">
+                <a href="{% url 'customer:home' %}" class="btn btn-outline-warning btn-sm rounded-pill px-3 py-2 fw-semibold">
+                    <i class="fa-solid fa-arrow-left me-1"></i> Back to Marketplace
+                </a>
+                <a href="{% url 'customer:index' %}" class="btn btn-outline-light btn-sm rounded-pill px-3 py-2 fw-semibold">
+                    <i class="fa-solid fa-house me-1"></i> Home
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Detail Section -->
+    <div class="container py-5">
+        <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+            <div class="row g-5 align-items-center">
+                <!-- Left: Pet Image -->
+                <div class="col-lg-5 text-center">
+                    {% if dog.image %}
+                        <img src="{{ dog.image.url }}" alt="{{ dog.name }}" class="pet-detail-img">
+                    {% else %}
+                        <div class="bg-secondary-subtle rounded-4 d-flex align-items-center justify-content-center" style="height: 380px;">
+                            <i class="fa-solid fa-dog fs-1 text-secondary"></i>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Right: Pet Information -->
+                <div class="col-lg-7">
+                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning px-3 py-2 rounded-pill fw-bold mb-2">
+                        <i class="fa-solid fa-circle-check me-1"></i> Verified Pet Listing
+                    </span>
+
+                    <h1 class="fw-bold text-dark display-5 mt-2 mb-1">{{ dog.name }}</h1>
+                    
+                    <p class="text-primary fs-5 fw-semibold mb-3">
+                        <i class="fa-solid fa-hourglass-half me-1"></i> Breed: {{ dog.breed }} 
+                        <span class="text-muted ms-2 fs-6">| Age: {{ dog.age_in_months }} Months</span>
+                    </p>
+
+                    <!-- Price -->
+                    <div class="mb-4">
+                        {% if dog.price > 0 %}
+                            <div class="price-tag">₹{{ dog.price }}</div>
+                        {% else %}
+                            <div class="badge bg-success fs-5 px-4 py-2 rounded-pill">Free Adoption</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Health & Details -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold text-dark">
+                            <i class="fa-solid fa-circle-info text-warning me-2"></i>Gender & Health Details
+                        </h6>
+                        <p class="text-muted leading-relaxed" style="white-space: pre-line;">
+                            {{ dog.description }}
+                        </p>
+                    </div>
+
+                    <hr class="my-4 text-secondary opacity-25">
+
+                    <!-- Contact Owner Button -->
+                    <div>
+                        <button type="button" class="btn contact-btn shadow-sm" data-bs-toggle="modal" data-bs-target="#contactModal">
+                            <i class="fa-solid fa-envelope me-2 text-warning"></i> Contact Owner via Email
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Owner Popup Modal -->
+    <div class="modal fade" id="contactModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 border-0 shadow">
+                <div class="modal-header border-0 bg-dark text-white rounded-top-4">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fa-solid fa-user-check text-warning me-2"></i>Pet Owner Details
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4 text-center">
+                    <div class="mb-3">
+                        <i class="fa-solid fa-circle-user text-warning display-4"></i>
+                        <h5 class="fw-bold text-dark mt-2 mb-0">{{ dog.seller.username }}</h5>
+                        <small class="text-muted">Registered Pet Owner</small>
+                    </div>
+
+                    <div class="bg-light p-3 rounded-3 mb-4 text-center">
+                        <span class="text-muted small d-block mb-1">Owner Email Address:</span>
+                        <strong class="fs-6 text-dark">{{ dog.seller.email|default:"No email registered" }}</strong>
+                    </div>
+
+                    {% if dog.seller.email %}
+                        <a href="mailto:{{ dog.seller.email }}?subject=Inquiry regarding {{ dog.name }} on Pawfect Match" class="btn btn-warning fw-bold py-2 px-4 rounded-pill w-100">
+                            <i class="fa-solid fa-paper-plane me-2"></i>Send Email to Owner
+                        </a>
+                    {% else %}
+                        <button class="btn btn-secondary py-2 rounded-pill w-100" disabled>Email not available</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

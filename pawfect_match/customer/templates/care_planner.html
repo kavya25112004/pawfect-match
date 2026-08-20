@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Care & Routine Planner | Pawfect Match</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .planner-header {
+            background-color: #2c3e50;
+            color: white;
+            border-radius: 20px;
+            padding: 35px 20px;
+        }
+        .routine-card {
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            background: #ffffff;
+            border: 1px solid #f0f0f0;
+        }
+        .routine-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+        }
+        .icon-box {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+    <!-- Top Navigation Bar (Home Only) -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-3 sticky-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-warning fs-4" href="{% url 'customer:index' %}">
+                <i class="fa-solid fa-paw me-2"></i>Pawfect Match
+            </a>
+            <div class="ms-auto">
+                <a href="{% url 'customer:index' %}" class="btn btn-outline-light btn-sm rounded-pill px-3 py-2 fw-semibold">
+                    <i class="fa-solid fa-house me-1"></i> Home
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <!-- Banner Header -->
+        <div class="planner-header text-center mb-5 shadow-sm">
+            <h2 class="fw-bold mb-2">
+                <i class="fa-solid fa-calendar-days text-warning me-2"></i>Age-Based Pet Routine Planner
+            </h2>
+            <p class="text-light opacity-75 mb-0">
+                Get customized diet, vaccination, and exercise routines based on your pet's age!
+            </p>
+        </div>
+
+        <!-- Age Input Form -->
+        <div class="row justify-content-center mb-5">
+            <div class="col-12 col-md-8 col-lg-6">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white text-center">
+                    <form method="GET" action="{% url 'customer:care_planner' %}" id="routineForm">
+                        <label class="form-label fw-bold text-dark fs-5 mb-3">Select Your Pet's Age (in Months):</label>
+                        <div class="input-group">
+                            <input type="number" id="petAgeInput" name="age" value="{{ request.GET.age|default:'' }}" class="form-control form-control-lg rounded-start-pill ps-4" placeholder="Enter age (e.g. 4)" min="1" max="240" required>
+                            <button type="submit" class="btn btn-warning rounded-end-pill px-4 fw-bold text-dark">
+                                <i class="fa-solid fa-wand-magic-sparkles me-1"></i> Generate Routine
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Routine Results Section -->
+        <div class="row justify-content-center" id="resultsSection" style="display: none;">
+            <div class="col-12 col-md-8 col-lg-6">
+                <div class="col-md-4">
+                    <span id="stageBadge" class="badge bg-warning-subtle text-dark border border-warning px-4 py-2 rounded-pill fw-bold fs-6 shadow-sm">
+                    </span>
+                </div>
+
+                <div class="row g-4">
+                    <!-- Diet & Nutrition -->
+                    <div class="col-12 col-md-8 col-lg-6">
+                        <div class="card routine-card p-4 h-100 shadow-sm">
+                            <div class="icon-box bg-success-subtle text-success">
+                                <i class="fa-solid fa-bowl-food"></i>
+                            </div>
+                            <h5 class="fw-bold text-dark mb-2">Diet & Nutrition</h5>
+                            <p id="dietText" class="text-muted small mb-0"></p>
+                        </div>
+                    </div>
+
+                    <!-- Vaccine & Health -->
+                    <div class="col-12 col-md-8 col-lg-6">
+                        <div class="card routine-card p-4 h-100 shadow-sm">
+                            <div class="icon-box bg-info-subtle text-info">
+                                <i class="fa-solid fa-syringe"></i>
+                            </div>
+                            <h5 class="fw-bold text-dark mb-2">Vaccine & Health</h5>
+                            <p id="vaccineText" class="text-muted small mb-0"></p>
+                        </div>
+                    </div>
+
+                    <!-- Daily Exercise -->
+                    <div class="col-12 col-md-8 col-lg-6">
+                        <div class="card routine-card p-4 h-100 shadow-sm">
+                            <div class="icon-box bg-warning-subtle text-warning">
+                                <i class="fa-solid fa-person-running"></i>
+                            </div>
+                            <h5 class="fw-bold text-dark mb-2">Daily Exercise</h5>
+                            <p id="exerciseText" class="text-muted small mb-0"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Routine Generator Logic -->
+    <script>
+        function showRoutine(age) {
+            age = parseInt(age);
+            if (!age || age < 1) return;
+
+            let stage = "", diet = "", vaccine = "", exercise = "";
+
+            if (age <= 2) {
+                stage = "Newborn / Weaning Stage (1-2 Months)";
+                diet = "Mother's milk or specialized puppy starter formula. Softened puppy kibble 4-5 times a day.";
+                vaccine = "Deworming starting at 2 weeks. Prepare for first core DHPP vaccination at 6-8 weeks.";
+                exercise = "Gentle indoor playtime with mother/siblings. Keep warm and ensure safe sleeping areas.";
+            } else if (age <= 6) {
+                stage = "Early Puppy Stage (3-6 Months)";
+                diet = "High-protein puppy kibble 3 times daily. Introduce boiled chicken, carrots, and clean drinking water.";
+                vaccine = "DHPP Booster shots at 10-12 & 14-16 weeks. Anti-Rabies vaccine at 3-4 months. Regular monthly deworming.";
+                exercise = "15-20 minutes daily short leash walks and basic obedience training (Sit, Stay, Paw). Avoid intense jumps.";
+            } else if (age <= 12) {
+                stage = "Adolescent Stage (7-12 Months)";
+                diet = "Transition gradually to adult formula (2 meals a day). Include calcium, omega-3, and dental chews.";
+                vaccine = "Annual vaccination boosters checkup. Regular tick & flea prevention treatments.";
+                exercise = "30-45 minutes daily brisk walking, fetch games, socialization with other dogs in safe environments.";
+            } else if (age <= 84) {
+                stage = "Adult Stage (1-7 Years)";
+                diet = "Balanced adult dog food with portion control based on body weight twice daily. Fresh veggies and proteins.";
+                vaccine = "Annual Anti-Rabies and DHPP booster shots. Bi-annual general health and dental checkup.";
+                exercise = "45-60 minutes daily active exercise, running, fetching, agility play to maintain ideal weight.";
+            } else {
+                stage = "Senior Stage (7+ Years)";
+                diet = "Senior dog food with glucosamine for joint health. Easy-to-digest low-fat meals twice daily.";
+                vaccine = "Annual geriatric blood profile, heart checkup, and routine booster updates.";
+                exercise = "20-30 minutes gentle, relaxed walks on flat ground. Joint massage and orthopaedic bedding.";
+            }
+
+            document.getElementById('stageBadge').innerHTML = `<i class="fa-solid fa-paw me-2"></i>Tailored Plan for ${age} Month Old Pet (${stage})`;
+            document.getElementById('dietText').innerText = diet;
+            document.getElementById('vaccineText').innerText = vaccine;
+            document.getElementById('exerciseText').innerText = exercise;
+            document.getElementById('resultsSection').style.display = 'flex';
+        }
+
+        // Auto load if age is in URL (?age=...)
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const ageParam = urlParams.get('age') || document.getElementById('petAgeInput').value;
+            if (ageParam) {
+                showRoutine(ageParam);
+            }
+        });
+    </script>
+</body>
+</html>

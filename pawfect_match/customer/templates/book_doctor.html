@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Home Visit | Pawfect Match</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f4f6f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        /* Navbar */
+        .custom-navbar {
+            background-color: #1a252f;
+            padding: 14px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .navbar-brand {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #ff9f43 !important;
+            letter-spacing: 0.5px;
+        }
+
+        /* Card & Header matching app theme */
+        .booking-card {
+            border: none;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
+            background: #ffffff;
+        }
+        .card-header-theme {
+            background: linear-gradient(135deg, #e67e22 0%, #f39c12 100%);
+            color: #ffffff;
+            padding: 24px 30px;
+            border: none;
+        }
+
+        /* Form Inputs */
+        .form-label {
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: #2c3e50;
+            margin-bottom: 6px;
+        }
+        .form-control, .form-select {
+            border-radius: 10px;
+            padding: 11px 15px;
+            border: 1px solid #dcdde1;
+            background-color: #fbfbfb;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+        .form-control:focus, .form-select:focus {
+            background-color: #ffffff;
+            border-color: #e67e22;
+            box-shadow: 0 0 0 0.2rem rgba(230, 126, 34, 0.15);
+        }
+
+        /* Buttons */
+        .btn-confirm {
+            background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+            color: white;
+            font-weight: 700;
+            border-radius: 12px;
+            padding: 13px;
+            border: none;
+            transition: all 0.3s;
+        }
+        .btn-confirm:hover {
+            background: linear-gradient(135deg, #d35400 0%, #b84300 100%);
+            color: white;
+            box-shadow: 0 6px 18px rgba(211, 84, 0, 0.3);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navbar -->
+    <nav class="navbar custom-navbar sticky-top">
+        <div class="container d-flex justify-content-between align-items-center">
+            <!-- Left: Brand Logo -->
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'customer:index' %}">
+                <i class="fa-solid fa-paw fs-3"></i>
+                <span>Pawfect Match</span>
+            </a>
+
+            <!-- Right: Navigation Buttons (Home & Back to Doctors only) -->
+            <div class="d-flex align-items-center gap-2">
+                <a href="{% url 'customer:index' %}" class="btn btn-outline-light btn-sm rounded-pill px-3 py-2 fw-semibold">
+                    <i class="fa-solid fa-house me-1"></i> Home
+                </a>
+                <a href="{% url 'customer:doctor_list' %}" class="btn btn-warning btn-sm rounded-pill px-3 py-2 fw-semibold text-dark">
+                    <i class="fa-solid fa-user-doctor me-1"></i> Back to Doctors
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Booking Section -->
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                
+                <div class="card booking-card">
+                    <!-- Themed Header -->
+                    <div class="card-header-theme d-flex align-items-center justify-content-between">
+                        <div>
+                            <h4 class="fw-bold mb-1 d-flex align-items-center gap-2">
+                                <i class="fa-solid fa-house-medical"></i> Book Doorstep Doctor Visit
+                            </h4>
+                            <p class="mb-0 small text-white opacity-90">Schedule a verified veterinary doctor visit to your home</p>
+                        </div>
+                        {% if doctor %}
+                            <div class="text-end d-none d-md-block">
+                                <small class="text-white-50 d-block">Consulting Doctor</small>
+                                <span class="badge bg-dark bg-opacity-50 fs-6 px-3 py-2 rounded-pill">Dr. {{ doctor.username }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Booking Form -->
+                    <div class="card-body p-4 p-md-5">
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-danger py-2 px-3 mb-3 small rounded-3">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        <form method="POST">
+                            {% csrf_token %}
+
+                            <div class="row g-4 mb-3">
+                                <!-- Pet Name -->
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="fa-solid fa-dog text-warning me-1"></i> Pet Name
+                                    </label>
+                                    <input type="text" name="pet_name" class="form-control" placeholder="Enter pet's name" required>
+                                </div>
+
+                                <!-- Pet Breed -->
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="fa-solid fa-shield-cat text-warning me-1"></i> Pet Breed
+                                    </label>
+                                    <input type="text" name="pet_breed" class="form-control" placeholder="e.g. Labrador, Persian Cat" required>
+                                </div>
+                            </div>
+
+                            <div class="row g-4 mb-3">
+                                <!-- Preferred Date -->
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="fa-solid fa-calendar-day text-warning me-1"></i> Preferred Date
+                                    </label>
+                                    <input type="date" name="preferred_date" class="form-control" required>
+                                </div>
+
+                                <!-- Preferred Time -->
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="fa-solid fa-clock text-warning me-1"></i> Preferred Time
+                                    </label>
+                                    <input type="time" name="booking_time" class="form-control" required>
+                                </div>
+                            </div>
+
+                            <!-- Health Issue / Reason -->
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fa-solid fa-notes-medical text-warning me-1"></i> Health Issue / Reason for Visit
+                                </label>
+                                <textarea name="health_issue" rows="3" class="form-control" placeholder="Describe symptoms, vaccination needs, or general checkup details..." required></textarea>
+                            </div>
+
+                            <!-- Home Address -->
+                            <div class="mb-4">
+                                <label class="form-label">
+                                    <i class="fa-solid fa-location-dot text-warning me-1"></i> Home Address for Doorstep Visit
+                                </label>
+                                <textarea name="address" rows="2" class="form-control" placeholder="Enter complete address with house name, landmark, and contact number..." required>{{ user.address|default:'' }}</textarea>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn btn-confirm w-100 fs-6 shadow-sm">
+                                <i class="fa-solid fa-check-circle me-1"></i> Confirm & Book Appointment
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

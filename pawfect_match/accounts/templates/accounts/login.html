@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In | Pawfect Match</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+        .auth-card {
+            border: none;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .auth-header {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            padding: 2.5rem 2rem;
+            text-align: center;
+        }
+        .form-control {
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            border: 1.5px solid #e2e8f0;
+        }
+        .form-control:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 0.25rem rgba(245, 158, 11, 0.25);
+        }
+        .btn-primary-custom {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 0.8rem;
+            font-weight: 700;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-4 mb-4" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <div class="card auth-card bg-white">
+                    <div class="auth-header">
+                        <a href="{% url 'customer:index' %}" class="text-white text-decoration-none">
+                            <h2 class="fw-bold mb-1"><i class="fa-solid fa-paw me-2"></i>Pawfect Match</h2>
+                        </a>
+                        <p class="mb-0 text-white-50">Welcome back! Access your account.</p>
+                    </div>
+
+                    <div class="card-body p-4 p-md-5">
+                        <form method="POST">
+                            {% csrf_token %}
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-dark"><i class="fa-solid fa-user me-2 text-warning"></i>Username</label>
+                                <input type="text" name="username" class="form-control" placeholder="Enter your username" required>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-dark"><i class="fa-solid fa-lock me-2 text-warning"></i>Password</label>
+                                <input type="password" name="password" class="form-control" placeholder="Enter your password" required>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary-custom w-100 mb-3 shadow">
+                                <i class="fa-solid fa-right-to-bracket me-2"></i>Sign In
+                            </button>
+
+                            <div class="text-center pt-3 border-top">
+                                <p class="text-muted mb-0 small">Don't have an account yet? 
+                                    <a href="{% url 'accounts:register' %}" class="text-warning fw-bold text-decoration-none">Register Here</a>
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

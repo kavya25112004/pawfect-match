@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard | Pawfect Match</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .badge-pending { background-color: #ffc107; color: #000; }
+        .badge-accepted { background-color: #0d6efd; color: #fff; }
+        .badge-completed { background-color: #198754; color: #fff; }
+        .badge-rejected { background-color: #dc3545; color: #fff; }
+    </style>
+</head>
+<body class="bg-light">
+
+    <!-- Top Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-3 shadow sticky-top">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand fw-bold text-info fs-4" href="{% url 'staff_panel:dashboard' %}">
+                <i class="fa-solid fa-user-doctor me-2"></i>Doctor Portal
+            </a>
+            <div class="d-flex align-items-center gap-2">
+                <a href="{% url 'customer:index' %}" class="btn btn-outline-light btn-sm rounded-pill px-3">
+                    <i class="fa-solid fa-house me-1"></i> Main Home
+                </a>
+                <a href="{% url 'accounts:logout' %}" class="btn btn-danger btn-sm rounded-pill px-3">
+                    <i class="fa-solid fa-right-from-bracket me-1"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+
+        <!-- Flash Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success alert-dismissible fade show rounded-4" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Welcome Banner & Profile Card -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-info-subtle text-info p-3 rounded-circle fs-2 d-flex align-items-center justify-content-center" style="width: 70px; height: 70px;">
+                        <i class="fa-solid fa-stethoscope"></i>
+                    </div>
+                    <div>
+                        <h3 class="fw-bold text-dark mb-0">Welcome, Dr. {{ request.user.username }}</h3>
+                        <p class="text-muted mb-0 small">
+                            {% if profile %}
+                                <span class="badge bg-primary me-1">{{ profile.specialization }}</span>
+                                <span class="text-secondary fw-semibold">{{ profile.qualification }}</span> | 
+                                <i class="fa-solid fa-location-dot text-danger ms-1"></i> {{ profile.district }}
+                            {% else %}
+                                Veterinary Professional
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                <div>
+                    {% if profile %}
+                        <span class="badge bg-success-subtle text-success fs-6 px-3 py-2 rounded-pill border border-success">
+                            Fee: ₹{{ profile.consultation_fee }}
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Appointment Bookings Section -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold text-dark mb-0">
+                    <i class="fa-solid fa-calendar-check text-primary me-2"></i>Patient Appointment Requests
+                </h5>
+                <span class="badge bg-secondary rounded-pill">{{ bookings.count }} Total</span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle table-hover">
+    <thead class="table-light">
+        <tr class="text-muted small">
+            <th>Pet & Owner</th>
+            <th>Issue / Concern</th>
+            <th>Date & Time</th>
+            <th>Contact / Address</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for booking in bookings %}
+        <tr>
+            <!-- Pet & Owner -->
+            <td>
+                <div class="fw-bold text-dark"><i class="fa-solid fa-dog text-warning me-1"></i> {{ booking.pet_name }}</div>
+                <div class="text-muted small">Breed: {{ booking.pet_breed }}</div>
+                <div class="text-secondary small"><i class="fa-solid fa-user me-1"></i> Owner: {{ booking.customer.username }}</div>
+            </td>
+
+            
+
+            <!-- Date & Time -->
+            <td>
+                <div class="fw-semibold text-dark">{{ booking.booking_date }}</div>
+                <div class="text-muted small">{{ booking.booking_time }}</div>
+            </td>
+
+            <!-- Address -->
+            <td class="text-secondary small">
+                {{ booking.address }}
+            </td>
+
+            <!-- Status -->
+            <td>
+                {% if booking.status == 'Accepted' or booking.status == 'Confirmed' %}
+                    <span class="badge bg-success rounded-pill px-3 py-2">Accepted</span>
+                {% elif booking.status == 'Rejected' or booking.status == 'Cancelled' %}
+                    <span class="badge bg-danger rounded-pill px-3 py-2">Rejected</span>
+                {% elif booking.status == 'Completed' %}
+                    <span class="badge bg-primary rounded-pill px-3 py-2">Completed</span>
+                {% else %}
+                    <span class="badge bg-warning text-dark rounded-pill px-3 py-2">Pending</span>
+                {% endif %}
+            </td>
+
+            <!-- Actions (Accept / Reject / Complete) -->
+<td>
+    {% if booking.status == 'Pending' or not booking.status %}
+        <div class="d-flex gap-1">
+            <a href="{% url 'staff_panel:update_status' booking.id 'accepted' %}" class="btn btn-sm btn-success rounded-pill px-3">
+                <i class="fa-solid fa-check me-1"></i> Accept
+            </a>
+            <a href="{% url 'staff_panel:update_status' booking.id 'rejected' %}" class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                <i class="fa-solid fa-xmark me-1"></i> Reject
+            </a>
+        </div>
+    {% elif booking.status == 'Accepted' or booking.status == 'Confirmed' %}
+        <a href="{% url 'staff_panel:update_status' booking.id 'completed' %}" class="btn btn-sm btn-primary rounded-pill px-3">
+            <i class="fa-solid fa-check-double me-1"></i> Complete
+        </a>
+    {% elif booking.status == 'Completed' %}
+        <span class="badge bg-light text-primary border"><i class="fa-solid fa-check me-1"></i> Consultation Done</span>
+    {% else %}
+        <span class="text-muted small">No actions</span>
+    {% endif %}
+</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6" class="text-center py-4 text-muted">No appointments found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Vet Bookings | Pawfect Match</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .custom-navbar { background-color: #1a252f; padding: 14px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .navbar-brand { font-size: 1.4rem; font-weight: 700; color: #ff9f43 !important; }
+        .booking-card { border: none; border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06); background: #ffffff; }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar custom-navbar sticky-top">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'customer:index' %}">
+                <i class="fa-solid fa-paw fs-3"></i>
+                <span>Pawfect Match</span>
+            </a>
+            <div class="d-flex align-items-center gap-2">
+                <a href="{% url 'customer:index' %}" class="btn btn-outline-light btn-sm rounded-pill px-3 py-2 fw-semibold">
+                    <i class="fa-solid fa-house me-1"></i> Home
+                </a>
+                <a href="{% url 'customer:doctor_list' %}" class="btn btn-warning btn-sm rounded-pill px-3 py-2 fw-semibold text-dark">
+                    <i class="fa-solid fa-user-doctor me-1"></i> Book Consultation
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="mb-4">
+            <h3 class="fw-bold text-dark mb-1">
+                <i class="fa-solid fa-house-medical text-primary me-2"></i> My Doorstep Vet Consultations
+            </h3>
+            <p class="text-muted">Track, manage and cancel your scheduled doctor appointments</p>
+        </div>
+
+        <div class="row g-4">
+            {% for item in bookings %}
+                <div class="col-md-6 col-lg-5">
+                    <div class="card booking-card p-4 h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <!-- Header: Pet Name & Status -->
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <h5 class="fw-bold mb-1 text-dark">
+                                    <i class="fa-solid fa-dog text-warning me-2"></i>{{ item.pet_name }} 
+                                    <span class="text-muted fs-6 fw-normal">({{ item.pet_breed }})</span>
+                                </h5>
+                                
+                                <!-- Status Badges -->
+                                {% if item.status == 'Accepted' or item.status == 'Confirmed' %}
+                                    <span class="badge bg-success rounded-pill px-3 py-2">Confirmed / Accepted</span>
+                                {% elif item.status == 'Completed' %}
+                                    <span class="badge bg-primary rounded-pill px-3 py-2"><i class="fa-solid fa-check-double me-1"></i> Completed</span>
+                                {% elif item.status == 'Cancelled' or item.status == 'Rejected' %}
+                                    <span class="badge bg-danger rounded-pill px-3 py-2">Cancelled</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark rounded-pill px-3 py-2">Pending</span>
+                                {% endif %}
+                            </div>
+
+                            <!-- Details -->
+                            <div class="border-top pt-3 text-secondary small">
+                                <p class="mb-2">
+                                    <i class="fa-solid fa-user-doctor text-info me-2"></i>
+                                    <strong>Doctor:</strong> Dr. {{ item.doctor.username }}
+                                </p>
+                                <p class="mb-2">
+                                    <i class="fa-solid fa-calendar-day text-primary me-2"></i>
+                                    <strong>Date & Time:</strong> {{ item.booking_date }} at {{ item.booking_time }}
+                                </p>
+                                <p class="mb-0">
+                                    <i class="fa-solid fa-location-dot text-danger me-2"></i>
+                                    <strong>Address:</strong> {{ item.address }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Customer Action Buttons (Complete / Cancel) -->
+                        <div class="border-top pt-3 mt-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                {% if item.status != 'Completed' and item.status != 'Cancelled' %}
+                                    <a href="{% url 'customer:cancel_booking' item.id %}" onclick="return confirm('Are you sure you want to cancel and delete this booking?')" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                                        <i class="fa-solid fa-trash me-1"></i> Cancel & Delete
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted small">No action needed</span>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                {% if item.status == 'Accepted' or item.status == 'Confirmed' %}
+                                    <a href="{% url 'customer:complete_booking_customer' item.id %}" class="btn btn-primary btn-sm rounded-pill px-3 fw-semibold">
+                                        <i class="fa-solid fa-check-double me-1"></i> Mark Completed
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center py-5">
+                    <i class="fa-solid fa-calendar-xmark text-muted display-3 mb-3"></i>
+                    <h5 class="text-muted fw-bold">No Consultations Booked Yet</h5>
+                    <p class="text-secondary small">Book an experienced vet doctor for doorstep pet care.</p>
+                    <a href="{% url 'customer:doctor_list' %}" class="btn btn-warning rounded-pill px-4 fw-semibold mt-2">
+                        Book a Doctor
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
