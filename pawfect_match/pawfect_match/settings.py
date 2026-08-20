@@ -132,20 +132,10 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-import cloudinary
-
-cloudinary.config(
-    cloud_name = "tuimxon6",
-    api_key = "996429716273993",
-    api_secret = "നിങ്ങളുടെ_API_SECRET_KEY",
-    secure = True
-)
-
-STORAGES = {
-    "default": {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'tuimxon6',
+    'API_KEY': '996429716273993',
+    'API_SECRET': 'omPOzUXQjKZubs1UupS992FyBqE',
 }
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
