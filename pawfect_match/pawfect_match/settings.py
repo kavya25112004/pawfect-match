@@ -37,7 +37,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'cloudinary_storage',
     'cloudinary',
     'accounts',
     'customer',
@@ -133,12 +132,14 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+import cloudinary
 
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'tuimxon6',
-    'API_KEY': '996429716273993',
-    'API_SECRET': 'omPOzUXQjKZubs1UupS992FyBqE'
-}
+cloudinary.config(
+    cloud_name = "tuimxon6",
+    api_key = "996429716273993",
+    api_secret = "നിങ്ങളുടെ_API_SECRET_KEY",
+    secure = True
+)
 
 STORAGES = {
     "default": {
